@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 @RestControllerAdvice
@@ -24,8 +24,8 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    @ExceptionHandler(PageNotFoundException.class)
-    public ResponseEntity<String> handlePageNotFoundException(PageNotFoundException ex){
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<String> handlePageNotFoundException(NoResourceFoundException ex){
         log.error("404 situation detected: ", ex);
         return new ResponseEntity<>("Specified path not found on this server",HttpStatus.NOT_FOUND);
     }

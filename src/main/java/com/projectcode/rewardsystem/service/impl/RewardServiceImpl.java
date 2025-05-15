@@ -31,10 +31,13 @@ public class RewardServiceImpl implements RewardService {
         if(fromDate == null )
             if(toDate != null)
                 fromDate = toDate.minusMonths(3);
-            else
-                fromDate = LocalDate.now().minusMonths(3);
-        else if(toDate == null)
+            else {
+                toDate = LocalDate.now();
+                fromDate = toDate.minusMonths(3);
+            }
+        else if(toDate == null) {
             toDate = LocalDate.now();
+        }
 
         List<Transaction> transactions = transactionRepository.findByCustomerIdAndDateBetween(customerId, fromDate, toDate);
         String customerName = customerRepository.findById(customerId)
