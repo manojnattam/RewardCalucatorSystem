@@ -1,8 +1,10 @@
 package com.projectcode.rewardsystem.service.impl;
 
 import com.projectcode.rewardsystem.dto.RewardResponse;
+import com.projectcode.rewardsystem.dto.TransactionDTO;
 import com.projectcode.rewardsystem.exception.CustomerNotFoundException;
-import com.projectcode.rewardsystem.exception.InvalidParameterException;
+import com.projectcode.rewardsystem.utility.DateValidator;
+import com.projectcode.rewardsystem.utility.TransactionMapper;
 import com.projectcode.rewardsystem.model.Customer;
 import com.projectcode.rewardsystem.model.Transaction;
 import com.projectcode.rewardsystem.repository.CustomerRepository;
@@ -14,30 +16,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class RewardServiceImpl implements RewardService {
     private static final Logger log = LoggerFactory.getLogger(RewardServiceImpl.class);
+
     @Autowired
     private TransactionRepository transactionRepository;
-
     @Autowired
     private CustomerRepository customerRepository;
 
     public RewardResponse calculateRewards(Long customerId, LocalDate fromDate, LocalDate toDate) {
-        if(fromDate == null )
-            if(toDate != null)
-                fromDate = toDate.minusMonths(3);
-            else {
-                toDate = LocalDate.now();
-                fromDate = toDate.minusMonths(3);
-            }
-        else if(toDate == null) {
-            toDate = LocalDate.now();
-        }
+        log.info("Validating date ranges from: {} to: {}", fromDate, toDate);
+        DateValidator.validateDateRange(fromDate, toDate);
+
+        log.info("Normalizing date inputs if any are null");
+        DateValidator.DateRange validatedDates = DateValidator.normalizeDateInputs(fromDate, toDate);
+        fromDate = validatedDates.fromDate();
+        toDate = validatedDates.toDate();
+        log.info("Normalized dates fromDate: {} toDates:{}", fromDate, toDate);
 
         List<Transaction> transactions = transactionRepository.findByCustomerIdAndDateBetween(customerId, fromDate, toDate);
         String customerName = customerRepository.findById(customerId)
@@ -55,13 +53,16 @@ public class RewardServiceImpl implements RewardService {
             total += points;
         }
         log.info("Total points: "+total);
+        List<TransactionDTO> transactionDTOList = TransactionMapper.toDTOList(transactions);
 
         return RewardResponse.builder()
                 .customerId(customerId)
                 .customerName(customerName)
+                .fromDate(fromDate)
+                .toDate(toDate)
                 .monthlyRewards(monthlyRewards)
                 .totalRewards(total)
-                .transactions(transactions)
+                .transactions(transactionDTOList)
                 .build();
     }
 

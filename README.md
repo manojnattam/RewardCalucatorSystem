@@ -1,6 +1,6 @@
 # RewardCalucatorSystem
 
-Spring boot application to calculate the points on their transactions.
+Spring boot application to calculate the reward points on their transactions.
 
 ## Problem description
 A retailer offers a rewards program to its customers, awarding points based on each recorded purchase.
@@ -19,18 +19,55 @@ Optional Query Params:
 - fromDate: yyyy-MM-dd
 - toDate: yyyy-MM-dd
 
-Example:
+### Conditions and Assumptions
+- Dates must follow ISO format: yyyy-MM-dd (e.g., 2025-05-14).
+- fromDate must not be after toDate
+- Neither fromDate and not toDate can be in the future
+- Both fromDate and toDate are optional query parameters
+  - if both are null, application will take the today date as toDate and (today - 3 months) as fromDate
+  - if fromDate is not provided, fromDate is (ToDate - 3 months)
+  - if toDate is not provided, toDate is today
 
-GET /api/rewards/1?from=2025-01-01&to=2025-04-01
-
-- if FROM date is not provided, application will consider the last 3 months from TO date if provided
-- FROM date cannot be after TO date
+#### Example:
+##### Request:
+```
+GET http://localhost:8080/api/rewards/1?fromDate=2025-03-15&toDate=2025-05-14
+```
+##### Response:
+```
+{
+    "customerId": 1,
+    "customerName": "Ram",
+    "fromDate": "2025-03-15",
+    "toDate": "2025-05-14",
+    "monthlyRewards": {
+        "APRIL-2025": 90,
+        "MARCH-2025": 25
+    },
+    "totalRewards": 115,
+    "transactions": [
+    {
+        "transactionId": 1,
+        "amount": 120.0,
+        "date": "2025-04-14"
+    },
+    {
+        "transactionId": 2,
+        "amount": 75.0,
+        "date": "2025-03-25"
+    },
+    {
+       "transactionId": 3,
+        "amount": 45.0,
+        "date": "2025-04-25"
+    }
+    ]
+}
+```
 
 ### Tech Stack
-- Java 17
+- Java 21
 - Spring Boot 3.3.11
-- Spring Web
-- Spring Data JPA
 - H2 Database (in-memory for demo)
 - JUnit 5, Mockito (for testing)
 - Maven

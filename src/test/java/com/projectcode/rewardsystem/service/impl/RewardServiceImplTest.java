@@ -6,6 +6,7 @@ import com.projectcode.rewardsystem.repository.CustomerRepository;
 import com.projectcode.rewardsystem.model.Transaction;
 import com.projectcode.rewardsystem.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,15 +35,11 @@ public class RewardServiceImplTest {
     @Mock
     private CustomerRepository customerRepository;
 
-    Transaction trn1, trn2;
     LocalDate fromDate, toDate;
     Customer customer;
 
     @BeforeEach
     public void setup() {
-        trn1 = new Transaction(1L, 1L, 120.0, LocalDate.now().minusDays(10));
-        trn2 = new Transaction(2L, 1L, 75.0, LocalDate.now().minusMonths(2));
-
         customer = new Customer(1L, "ram");
 
         fromDate = LocalDate.of(2025, 3, 1);
@@ -50,6 +47,7 @@ public class RewardServiceImplTest {
     }
 
     @Test
+    @DisplayName("Should return valid reward response for valid customer ID and date range")
     public void testCalculateRewards_WithMultipleTransactions_returns200() {
         List<Transaction> transactions = List.of(
                 new Transaction(1L, customer.getId(), 120.0, LocalDate.of(2025, 3, 15)),
@@ -67,13 +65,16 @@ public class RewardServiceImplTest {
         assertNotNull(response);
         assertEquals(115, response.getTotalRewards());
         assertEquals(customer.getName(), response.getCustomerName());
+        assertEquals(fromDate, response.getFromDate());
+        assertEquals(toDate, response.getToDate());
         assertEquals(90, response.getMonthlyRewards().get("MARCH-2025"));
         assertEquals(25, response.getMonthlyRewards().get("APRIL-2025"));
         assertEquals(0,response.getMonthlyRewards().get("MAY-2025"));
     }
 
     @Test
-    public void testCalculateRewards_NoTransactions_Returns200() {
+    @DisplayName("Should return empty transaction list when transactions not exist for the customer ID")
+    public void testCalculateRewards_NoTransactions() {
         when(transactionRepository.findByCustomerIdAndDateBetween(customer.getId(), fromDate, toDate))
                 .thenReturn(Collections.emptyList());
         when(customerRepository.findById(customer.getId()))
@@ -84,16 +85,20 @@ public class RewardServiceImplTest {
         assertNotNull(response);
         assertEquals(0, response.getTotalRewards());
         assertEquals(customer.getName(), response.getCustomerName());
+        assertEquals(fromDate, response.getFromDate());
+        assertEquals(toDate, response.getToDate());
         assertTrue(response.getMonthlyRewards().isEmpty());
         assertTrue(response.getTransactions().isEmpty());
     }
 
     @Test
-    public void testCalculateRewards_CustomerNotFound_Returns404(){
+    @DisplayName("Should throw Customer Not Found exception when customer ID does not exist")
+    public void testCalculateRewards_CustomerNotFound(){
         when(customerRepository.findById(customer.getId())).thenReturn(Optional.empty());
 
         CustomerNotFoundException ex =
-                assertThrows(CustomerNotFoundException.class,() -> rewardService.calculateRewards(customer.getId(), fromDate, toDate));
+                assertThrows(CustomerNotFoundException.class,
+                        () -> rewardService.calculateRewards(customer.getId(), fromDate, toDate));
         assertEquals("Customer not found with ID: "+customer.getId(), ex.getMessage());
     }
 
@@ -114,6 +119,7 @@ public class RewardServiceImplTest {
             "101, 52",
             "125, 100"
     })
+    @DisplayName("Should return the total points for the given amount")
     public void testCalculatePoints(double amount, int actualPoints){
             int points = rewardService.calculatePoints(amount);
 

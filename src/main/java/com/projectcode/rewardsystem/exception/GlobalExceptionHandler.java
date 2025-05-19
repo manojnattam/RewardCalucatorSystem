@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<String> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         log.error("Invalid parameter value: ", ex);
-        return new ResponseEntity<>("Invalid value for parameter '" + ex.getName() + "': expected type is " + Objects.requireNonNull(ex.getRequiredType()).getSimpleName(),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Invalid value for parameter '" + ex.getName() + "', expected type is " + Objects.requireNonNull(ex.getRequiredType()).getSimpleName(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(InvalidParameterException.class)

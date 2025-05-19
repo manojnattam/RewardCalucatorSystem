@@ -1,19 +1,24 @@
 package com.projectcode.rewardsystem.dto;
 
-import com.projectcode.rewardsystem.model.Transaction;
 import lombok.*;
+import org.springframework.cglib.core.Local;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-@Data
-@Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@ToString
 public class RewardResponse {
     private Long customerId;
     private String customerName;
+    private LocalDate fromDate;
+    private LocalDate toDate;
     private Map<String, Integer> monthlyRewards;
     private int totalRewards;
-    private List<Transaction> transactions;
+    private List<TransactionDTO> transactions;
 }
