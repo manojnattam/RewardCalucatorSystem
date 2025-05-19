@@ -22,7 +22,7 @@ Optional Query Params:
 ### Conditions and Assumptions
 - Dates must follow ISO format: yyyy-MM-dd (e.g., 2025-05-14).
 - fromDate must not be after toDate
-- Neither fromDate and not toDate can be in the future
+- Neither fromDate and nor toDate can be in the future
 - Both fromDate and toDate are optional query parameters
   - if both are null, application will take the today date as toDate and (today - 3 months) as fromDate
   - if fromDate is not provided, fromDate is (ToDate - 3 months)
