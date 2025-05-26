@@ -1,7 +1,6 @@
 package com.projectcode.rewardsystem.dto;
 
 import lombok.*;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 import java.util.List;

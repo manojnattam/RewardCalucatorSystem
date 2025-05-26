@@ -151,6 +151,4 @@ public class RewardControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("to"+message));
     }
-
-
 }
