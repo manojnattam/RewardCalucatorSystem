@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -28,12 +27,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handlePageNotFoundException(NoResourceFoundException ex){
         log.error("404 situation detected: ", ex);
         return new ResponseEntity<>("Specified path not found on this server",HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<String> handleMissingParam(MissingServletRequestParameterException ex) {
-        log.error("Missing the required parameter in Request: " , ex);
-        return new ResponseEntity<>("Missing required parameter: " + ex.getParameterName(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
